@@ -1,7 +1,8 @@
 ﻿using Entities;
 using ServiceContracts;
 using ServiceContracts.DTO;
-using System.Transactions;
+using Services.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace Services
 {
@@ -33,11 +34,8 @@ namespace Services
                 throw new ArgumentNullException(nameof(personAddRequest), "PersonAddRequest cannot be null");
             }
 
-            // Validate all properties of "personAddRequest"
-            if (string.IsNullOrEmpty(personAddRequest.PersonName))
-            {
-                throw new ArgumentException("PersonName can't be blank");
-            }
+            // Model validation for "personAddRequest"
+            ValidationHelper.ModelValidation(personAddRequest);
 
             // Convert "personAddRequest" to "Person" object
             Person person = personAddRequest.ToPerson();
