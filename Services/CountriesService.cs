@@ -8,6 +8,7 @@ namespace Services
     {
         private readonly List<Country> _countries;
 
+        // Constructor
         public CountriesService()
         {
             _countries = new List<Country>();
@@ -48,7 +49,7 @@ namespace Services
 
         public List<CountryResponse> GetAllCountries()
         {
-            throw new NotImplementedException();
+            return _countries.Select(country => country.ToCountryResponse()).ToList();
         }
     }
 }
