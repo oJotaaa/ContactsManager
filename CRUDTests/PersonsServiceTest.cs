@@ -3,6 +3,7 @@ using ServiceContracts.DTO;
 using Entities;
 using Services;
 using ServiceContracts.Enums;
+using Xunit.Abstractions;
 
 namespace CRUDTests
 {
@@ -11,12 +12,14 @@ namespace CRUDTests
         // Private fields
         private readonly IPersonsService _personService;
         private readonly ICountriesService _countriesService;
+        private readonly ITestOutputHelper _testOutputHelper;
 
         // Constructor
-        public PersonsServiceTest()
+        public PersonsServiceTest(ITestOutputHelper testOutputHelper)
         {
             _personService = new PersonsService();
             _countriesService = new CountriesService();
+            _testOutputHelper = testOutputHelper;
         }
 
         #region AddPersonTests
@@ -133,7 +136,7 @@ namespace CRUDTests
         {
             // Arrange
             CountryAddRequest countryAddRequest1 = new CountryAddRequest() { CountryName = "USA" };
-            CountryAddRequest countryAddRequest2 = new CountryAddRequest() { CountryName = "Indiia" };
+            CountryAddRequest countryAddRequest2 = new CountryAddRequest() { CountryName = "India" };
 
             CountryResponse countryResponse1 = _countriesService.AddCountry(countryAddRequest1);
             CountryResponse countryResponse2 = _countriesService.AddCountry(countryAddRequest2);
@@ -186,7 +189,22 @@ namespace CRUDTests
                 addedPersons.Add(personResponse);
             }
 
+            // print added persons for debugging
+            _testOutputHelper.WriteLine("Expected:");
+            foreach (PersonResponse person in addedPersons)
+            {
+                _testOutputHelper.WriteLine($"Added Person: {person.ToString()}");
+            }
+
             List<PersonResponse> personsListFromGet = _personService.GetAllPersons();
+
+            // print persons from GetAllPersons for debugging
+            _testOutputHelper.WriteLine("Expected:");
+            foreach (PersonResponse person in personsListFromGet)
+            {
+                _testOutputHelper.WriteLine($"Added Person: {person.ToString()}");
+            }
+
 
             foreach (PersonResponse person in addedPersons)
             {
