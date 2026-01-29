@@ -66,7 +66,7 @@ namespace Services
                 return null;
 
             // Convert matching person object to PersonResponse and returns it
-            return person.ToPersonResponse();
+            return ConvertPersonIntoPersonResponse(person);
         }
     }
 }
