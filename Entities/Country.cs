@@ -5,7 +5,7 @@
     /// </summary>
     public class Country
     {
-        public Guid Id { get; set; }
+        public Guid CountryID { get; set; }
         public string? CountryName { get; set; }
     }
 }
