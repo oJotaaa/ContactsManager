@@ -20,5 +20,12 @@ namespace ServiceContracts
         /// <returns>All countries from the list as List of CountryResponse</returns>
         List<CountryResponse> GetAllCountries();
 
+        /// <summary>
+        /// Retrieves country information for the specified country identifier.
+        /// </summary>
+        /// <param name="countryID">The unique identifier of the country to retrieve. If null, the method returns null.</param>
+        /// <returns>A <see cref="CountryResponse"/> containing the country information if found; otherwise, null.</returns>
+        CountryResponse? GetCountryByCountryID(Guid? countryID);
+
     }
 }
