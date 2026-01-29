@@ -50,10 +50,10 @@ namespace ServiceContracts.DTO
     public static class PersonExtensions
     {
         /// <summary>
-        /// 
+        /// An extension method to convert Person entity to PersonResponse DTO
         /// </summary>
-        /// <param name="person"></param>
-        /// <returns></returns>
+        /// <param name="person">The person object to convert</param>
+        /// <returns>Returns the converted PersonResponse object</returns>
         public static PersonResponse ToPersonResponse(this Person person)
         {
             return new PersonResponse()
