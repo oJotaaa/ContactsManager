@@ -13,6 +13,7 @@ namespace CRUDTests
             _countriesService = new CountriesService();
         }
 
+        #region AddCountryTests
         // When CountryAddRequest is null, AddCountry should throw ArgumentNullException
         [Fact]
         public void AddCountry_NullCountry()
@@ -61,9 +62,57 @@ namespace CRUDTests
 
             // Act
             CountryResponse response = _countriesService.AddCountry(request);
+            List<CountryResponse> all_countries = _countriesService.GetAllCountries();
 
             // Assert
             Assert.True(response.CountryID != Guid.Empty);
+            Assert.Contains(response, all_countries);
         }
+
+        #endregion
+
+        #region GetAllCountriesTests
+
+        // The list of countries should be empty by default (before adding any country)
+        [Fact]
+        public void GetAllCountries_EmptyList()
+        {
+            // Acts
+            List<CountryResponse> actual_country_response_list = _countriesService.GetAllCountries();
+
+            // Assert
+            Assert.Empty(actual_country_response_list);
+        }
+
+        // The getAllCountries should return all countries added via AddCountry
+        [Fact]
+        public void GetAllCountries_AddFewCountries()
+        {
+            // Arrange
+            List<CountryAddRequest> country_request_list = new List<CountryAddRequest>()
+            {
+                new CountryAddRequest() { CountryName = "USA" },
+                new CountryAddRequest() { CountryName = "UK" },
+            };
+
+            // Act
+            List<CountryResponse> country_list_from_add_country = new List<CountryResponse>();
+
+            foreach (CountryAddRequest country_request in country_request_list)
+            {
+                country_list_from_add_country.Add(_countriesService.AddCountry(country_request));
+            }
+
+            List<CountryResponse> actualCountryResponseList = _countriesService.GetAllCountries();
+
+            // Assert
+            // Read each element from country_list_from_add_country
+            foreach (CountryResponse expected_country in country_list_from_add_country)
+            {
+                Assert.Contains(expected_country, actualCountryResponseList);
+            }
+        }
+
+        #endregion
     }
 }
