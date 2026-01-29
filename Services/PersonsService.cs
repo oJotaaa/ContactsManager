@@ -2,7 +2,6 @@
 using ServiceContracts;
 using ServiceContracts.DTO;
 using Services.Helpers;
-using System.ComponentModel.DataAnnotations;
 
 namespace Services
 {
@@ -53,6 +52,21 @@ namespace Services
         public List<PersonResponse> GetAllPersons()
         {
             throw new NotImplementedException();
+        }
+
+        public PersonResponse? GetPersonByPersonID(Guid? personID)
+        {
+            // Check if "personID" is null
+            if (personID == null)
+                return null;
+
+            // Get matching person from List<Person> based personID
+            Person? person = _persons.FirstOrDefault(person => person.PersonID == personID);
+            if (person == null)
+                return null;
+
+            // Convert matching person object to PersonResponse and returns it
+            return person.ToPersonResponse();
         }
     }
 }
