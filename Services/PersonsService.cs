@@ -198,5 +198,36 @@ namespace Services
 
             return sortedPersons;
         }
+
+        public PersonResponse UpdatePerson(PersonUpdateRequest? personUpdateRequest)
+        {
+            // Check if "personUpdateRequest" is not null
+            if (personUpdateRequest == null)
+                throw new ArgumentNullException(nameof(personUpdateRequest), "PersonUpdateRequest cannot be null");
+
+            // Validate all properties of "personUpdateRequest"
+            ValidationHelper.ModelValidation(personUpdateRequest);
+
+            // Get the matching "Person" object from List<Persons> based on "PersonID"
+            Person? matchingPerson = _persons.FirstOrDefault(person => person.PersonID == personUpdateRequest.PersonID);
+
+            // Check if matching "Person" object is not null
+            if (matchingPerson == null)
+            {
+                throw new ArgumentException($"Person with PersonID '{personUpdateRequest.PersonID}' not found");
+            }
+
+            // Update all details from "personUpdateRequest" to matching "Person" object
+            matchingPerson.PersonName = personUpdateRequest.PersonName;
+            matchingPerson.Email = personUpdateRequest.Email;
+            matchingPerson.DateOfBirth = personUpdateRequest.DateOfBirth;
+            matchingPerson.Gender = personUpdateRequest.Gender.ToString();
+            matchingPerson.CountryID = personUpdateRequest.CountryID;
+            matchingPerson.Address = personUpdateRequest.Address;
+            matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
+
+            // Convert the person object to PersonResponse object and return it
+            return ConvertPersonIntoPersonResponse(matchingPerson);
+        }
     }
 }
