@@ -48,5 +48,12 @@ namespace ServiceContracts
         /// <param name="sortOrder">ASC or DESC</param>
         /// <returns>Returns sorted persons as PersonResponse list</returns>
         List<PersonResponse> GetSortedPersons(List<PersonResponse> allPersons, string sortyBy, SortOrderOptions sortOrder);
+
+        /// <summary>
+        /// Updates the details of an existing person using the specified update request.
+        /// </summary>
+        /// <param name="personUpdateRequest">An object containing the update information for the person</param>
+        /// <returns>A response object containing the updated person details and the result of the update operation.</returns>
+        PersonResponse UpdatePerson(PersonUpdateRequest? personUpdateRequest);
     }
 }
