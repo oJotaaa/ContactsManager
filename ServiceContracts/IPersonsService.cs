@@ -55,5 +55,12 @@ namespace ServiceContracts
         /// <param name="personUpdateRequest">An object containing the update information for the person</param>
         /// <returns>A response object containing the updated person details and the result of the update operation.</returns>
         PersonResponse UpdatePerson(PersonUpdateRequest? personUpdateRequest);
+
+        /// <summary>
+        /// Deletes the person with the specified identifier from the data store.
+        /// </summary>
+        /// <param name="personID">The unique identifier of the person to delete. If null, the method does not perform any operation.</param>
+        /// <returns>true if the person was found and deleted; otherwise, false.</returns>
+        bool DeletePerson(Guid? personID);
     }
 }
