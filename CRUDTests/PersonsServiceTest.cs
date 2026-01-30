@@ -463,14 +463,14 @@ namespace CRUDTests
             // Act
             List<PersonResponse> personsListFromSort = _personService.GetSortedPersons(allPersons, nameof(Person.PersonName), SortOrderOptions.DESC);
 
-            // print persons from GetAllPersons for debugging
+            // print persons from GetSortedPersons for debugging
             _testOutputHelper.WriteLine("Expected:");
             foreach (PersonResponse person in personsListFromSort)
             {
-                _testOutputHelper.WriteLine($"Added Person: {person.ToString()}");
+                _testOutputHelper.WriteLine($"Sort Person: {person.ToString()}");
             }
 
-            addedPersons.OrderByDescending(temp => temp.PersonName).ToList();
+            addedPersons = addedPersons.OrderByDescending(temp => temp.PersonName).ToList();
 
             // Assert
             for (int i = 0; i < addedPersons.Count; i++)
