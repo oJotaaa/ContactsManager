@@ -69,7 +69,7 @@ namespace Services
             return ConvertPersonIntoPersonResponse(person);
         }
 
-        public List<PersonResponse> GetFilteredPersons(string searchBy, string? searchString)
+        public List<PersonResponse> GetFilteredPersons(string? searchBy, string searchString)
         {
             List<PersonResponse> allPersons = GetAllPersons();
             List<PersonResponse> matchingPersons = allPersons;
