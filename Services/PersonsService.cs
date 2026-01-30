@@ -229,5 +229,25 @@ namespace Services
             // Convert the person object to PersonResponse object and return it
             return ConvertPersonIntoPersonResponse(matchingPerson);
         }
+
+        public bool DeletePerson(Guid? personID)
+        {
+            // Check if "personID" is null
+            if (personID == null)
+                return false;
+
+            // Get the matching "Person" object from List<Persons> based on "personID"
+            Person? person = _persons.FirstOrDefault(person => person.PersonID == personID);
+
+            // Check if matching "Person" object is not null
+            if (person == null)
+                return false;
+
+            // Delete the matching "Person" object from List<Persons>
+            _persons.RemoveAll(temp => temp.PersonID == personID);
+
+            // Return boolean value indicating whether the deletion was successful or not
+            return true;
+        }
     }
 }
