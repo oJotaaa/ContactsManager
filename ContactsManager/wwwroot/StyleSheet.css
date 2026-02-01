@@ -238,6 +238,11 @@ a:hover
     margin: auto;
 }
 
+.mt 
+{
+    margin-top: 10px;
+}
+
 .margin-bottom
 {
     margin-bottom: 20px;
