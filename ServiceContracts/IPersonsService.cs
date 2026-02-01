@@ -38,7 +38,7 @@ namespace ServiceContracts
         /// match partial values.</param>
         /// <returns>A list of <see cref="PersonResponse"/> objects that match the search criteria. Returns an empty list if no
         /// persons are found.</returns>
-        List<PersonResponse> GetFilteredPersons(string? searchBy, string searchString);
+        List<PersonResponse> GetFilteredPersons(string searchBy, string? searchString);
 
         /// <summary>
         /// Returns sorted list of persons
