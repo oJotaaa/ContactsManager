@@ -75,5 +75,47 @@ namespace ContactsManager.Controllers
             // Navigate to Index() action method
             return RedirectToAction("Index", "Persons");
         }
+
+        [HttpGet]
+        [Route("[action]/{personID}")]
+        public IActionResult Edit(Guid personID)
+        {
+            PersonResponse? personResponse = _personsService.GetPersonByPersonID(personID);
+            if (personResponse == null)
+            {
+                return RedirectToAction("Index", "Persons");
+            }
+
+            List<CountryResponse> countries = _countriesService.GetAllCountries();
+            ViewBag.Countries = countries;
+
+            PersonUpdateRequest personUpdateRequest = personResponse.ToPersonUpdateRequest();
+            return View(personUpdateRequest);
+        }
+
+        [HttpPost]
+        [Route("[action]/{personID}")]
+        public IActionResult Edit(PersonUpdateRequest personUpdateRequest) 
+        {
+            PersonResponse? personResponse = _personsService.GetPersonByPersonID(personUpdateRequest.PersonID);
+
+            if (personResponse == null)
+            {
+                return RedirectToAction("Index", "Persons");
+            }
+
+            if (ModelState.IsValid)
+            {
+                PersonResponse updatedPerson = _personsService.UpdatePerson(personUpdateRequest);
+                return RedirectToAction("Index", "Persons");
+            }
+            else
+            {
+                List<CountryResponse> countries = _countriesService.GetAllCountries();
+                ViewBag.Countries = countries;
+                ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).SelectMany(e => e.ErrorMessage).ToList();
+                return View();
+            }
+        }
     }
 }
