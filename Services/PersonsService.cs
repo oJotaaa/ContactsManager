@@ -9,140 +9,14 @@ namespace Services
     public class PersonsService : IPersonsService
     {
         // Private fields
-        private readonly List<Person> _persons;
+        private readonly PersonsDbContext _db;
         private readonly ICountriesService _countriesService;
 
         // Constructor
-        public PersonsService(bool initialize = true)
+        public PersonsService(PersonsDbContext personsDbContext, ICountriesService countriesService)
         {
-            _persons = new List<Person>();
-            _countriesService = new CountriesService();
-
-            if (initialize)
-            {
-                _persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("B6BDB29E-0853-405C-9DBF-519795093816"),
-                    PersonName = "Chadd",
-                    Email = "csabey0@wordpress.com",
-                    DateOfBirth = DateTime.Parse("1998-04-29"),
-                    Gender = "Male",
-                    Address = "14916 Village Center",
-                    ReceiveNewsLetters = false,
-                    CountryID = Guid.Parse("EC878DA4-9CAD-4B0E-A28C-6D16F7950BF9")
-                });
-
-                _persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("466CAD53-3537-4B83-8003-3D6F55048A91"),
-                    PersonName = "Moll",
-                    Email = "mfarnon1@mtv.com",
-                    DateOfBirth = DateTime.Parse("1992-08-18"),
-                    Gender = "Female",
-                    Address = "53902 Derek Lane",
-                    ReceiveNewsLetters = true,
-                    CountryID = Guid.Parse("E11DF336-E385-48BE-BDC5-DD2CF905282F")
-                });
-
-                _persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("F4010EFD-28F4-4D45-BC7B-F91FD0BC3AB9"),
-                    PersonName = "Heloise",
-                    Email = "hdobbing2@cafepress.com",
-                    DateOfBirth = DateTime.Parse("1993-02-15"),
-                    Gender = "Female",
-                    Address = "3867 Charing Cross Junction",
-                    ReceiveNewsLetters = true,
-                    CountryID = Guid.Parse("B006CEBF-C0ED-4EB9-B175-727B861621D9")
-                });
-
-                _persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("F0A988F1-A9A0-4855-8A25-1D422C9393CF"),
-                    PersonName = "Faber",
-                    Email = "frubenov3@taobao.com",
-                    DateOfBirth = DateTime.Parse("1990-01-30"),
-                    Gender = "Male",
-                    Address = "7585 Coleman Avenue",
-                    ReceiveNewsLetters = true,
-                    CountryID = Guid.Parse("C41BDA78-434E-4782-B74B-34408B0E2A66")
-                });
-
-                _persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("28C51834-D502-46D3-8990-BB4B639ECD07"),
-                    PersonName = "Fernando",
-                    Email = "fmichelotti4@google.it",
-                    DateOfBirth = DateTime.Parse("1991-11-29"),
-                    Gender = "Male",
-                    Address = "48 Mendota Center",
-                    ReceiveNewsLetters = false,
-                    CountryID = Guid.Parse("1A904F09-F6AA-44FD-A8AA-DE79E46A7FFD")
-                });
-
-                _persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("D0071BD4-AB7D-47DA-AB4C-9C8714A67312"),
-                    PersonName = "Nonie",
-                    Email = "nspilsburie5@printfriendly.com",
-                    DateOfBirth = DateTime.Parse("2000-08-05"),
-                    Gender = "Female",
-                    Address = "90 Oak Valley Lane",
-                    ReceiveNewsLetters = false,
-                    CountryID = Guid.Parse("EC878DA4-9CAD-4B0E-A28C-6D16F7950BF9")
-                });
-
-                _persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("2903BE48-7D62-47E5-84D6-AE78E94A66DE"),
-                    PersonName = "Celine",
-                    Email = "cleeman6@vinaora.com",
-                    DateOfBirth = DateTime.Parse("1994-01-18"),
-                    Gender = "Female",
-                    Address = "8 Northview Pass",
-                    ReceiveNewsLetters = false,
-                    CountryID = Guid.Parse("E11DF336-E385-48BE-BDC5-DD2CF905282F")
-                });
-
-                _persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("CF84866A-D35E-4272-98A5-0C0202C1DD93"),
-                    PersonName = "Obed",
-                    Email = "osrawley7@thetimes.co.uk",
-                    DateOfBirth = DateTime.Parse("2000-08-14"),
-                    Gender = "Male",
-                    Address = "03 Clemons Hill",
-                    ReceiveNewsLetters = false,
-                    CountryID = Guid.Parse("B006CEBF-C0ED-4EB9-B175-727B861621D9")
-                });
-
-                _persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("84035C10-A2D6-4B14-BDDE-0DEC4DDFE06E"),
-                    PersonName = "Letty",
-                    Email = "ldansie8@tripadvisor.com",
-                    DateOfBirth = DateTime.Parse("1990-03-20"),
-                    Gender = "Female",
-                    Address = "53 Upham Point",
-                    ReceiveNewsLetters = false,
-                    CountryID = Guid.Parse("C41BDA78-434E-4782-B74B-34408B0E2A66")
-                });
-
-                _persons.Add(new Person
-                {
-                    PersonID = Guid.Parse("EE9D55F0-2112-49C6-9F21-D91860C74E66"),
-                    PersonName = "Wade",
-                    Email = "wlandman9@yolasite.com",
-                    DateOfBirth = DateTime.Parse("1996-05-20"),
-                    Gender = "Male",
-                    Address = "886 Eagle Crest Crossing",
-                    ReceiveNewsLetters = true,
-                    CountryID = Guid.Parse("1A904F09-F6AA-44FD-A8AA-DE79E46A7FFD")
-                });
-
-
-
-            }
+            _db = personsDbContext;
+            _countriesService = countriesService;
         }
 
         private PersonResponse ConvertPersonIntoPersonResponse(Person person)
@@ -169,8 +43,9 @@ namespace Services
             // Generate a new GUID for PersonID
             person.PersonID = Guid.NewGuid();
 
-            // Then add it into List<Persons>
-            _persons.Add(person);
+            // Then add it into Database
+            _db.Persons.Add(person);
+            _db.SaveChanges();
 
             // Return PersonResponse object with generated PersonID and other details
             return ConvertPersonIntoPersonResponse(person);
@@ -178,7 +53,7 @@ namespace Services
 
         public List<PersonResponse> GetAllPersons()
         {
-            return _persons.Select(person => ConvertPersonIntoPersonResponse(person)).ToList();
+            return _db.Persons.ToList().Select(person => ConvertPersonIntoPersonResponse(person)).ToList();
         }
 
         public PersonResponse? GetPersonByPersonID(Guid? personID)
@@ -187,8 +62,8 @@ namespace Services
             if (personID == null)
                 return null;
 
-            // Get matching person from List<Person> based personID
-            Person? person = _persons.FirstOrDefault(person => person.PersonID == personID);
+            // Get matching person from Database based personID
+            Person? person = _db.Persons.FirstOrDefault(person => person.PersonID == personID);
             if (person == null)
                 return null;
 
@@ -207,7 +82,7 @@ namespace Services
                 return matchingPersons;
             }
 
-            // Get matching persons from List<Persons> based on searchBy and searchString
+            // Get matching persons from Database based on searchBy and searchString
             switch (searchBy) 
             {
                 case nameof(PersonResponse.PersonName):
@@ -334,8 +209,8 @@ namespace Services
             // Validate all properties of "personUpdateRequest"
             ValidationHelper.ModelValidation(personUpdateRequest);
 
-            // Get the matching "Person" object from List<Persons> based on "PersonID"
-            Person? matchingPerson = _persons.FirstOrDefault(person => person.PersonID == personUpdateRequest.PersonID);
+            // Get the matching "Person" object from Database based on "PersonID"
+            Person? matchingPerson = _db.Persons.FirstOrDefault(person => person.PersonID == personUpdateRequest.PersonID);
 
             // Check if matching "Person" object is not null
             if (matchingPerson == null)
@@ -352,6 +227,8 @@ namespace Services
             matchingPerson.Address = personUpdateRequest.Address;
             matchingPerson.ReceiveNewsLetters = personUpdateRequest.ReceiveNewsLetters;
 
+            _db.SaveChanges();
+
             // Convert the person object to PersonResponse object and return it
             return ConvertPersonIntoPersonResponse(matchingPerson);
         }
@@ -362,15 +239,17 @@ namespace Services
             if (personID == null)
                 return false;
 
-            // Get the matching "Person" object from List<Persons> based on "personID"
-            Person? person = _persons.FirstOrDefault(person => person.PersonID == personID);
+            // Get the matching "Person" object from Database based on "personID"
+            Person? person = _db.Persons.FirstOrDefault(person => person.PersonID == personID);
 
             // Check if matching "Person" object is not null
             if (person == null)
                 return false;
 
-            // Delete the matching "Person" object from List<Persons>
-            _persons.RemoveAll(temp => temp.PersonID == personID);
+            // Delete the matching "Person" object from Database
+            _db.Persons.Remove(_db.Persons.First(temp => temp.PersonID == personID));
+
+            _db.SaveChanges();
 
             // Return boolean value indicating whether the deletion was successful or not
             return true;
