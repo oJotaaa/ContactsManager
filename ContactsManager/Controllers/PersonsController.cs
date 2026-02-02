@@ -87,7 +87,7 @@ namespace ContactsManager.Controllers
             }
 
             List<CountryResponse> countries = _countriesService.GetAllCountries();
-            ViewBag.Countries = countries;
+            ViewBag.Countries = countries.Select(temp => new SelectListItem() { Text = temp.CountryName, Value = temp.CountryID.ToString()});
 
             PersonUpdateRequest personUpdateRequest = personResponse.ToPersonUpdateRequest();
             return View(personUpdateRequest);
