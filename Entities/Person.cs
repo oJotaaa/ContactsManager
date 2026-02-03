@@ -19,12 +19,15 @@ namespace Entities
         [StringLength(10)]
         public string? Gender { get; set; }
 
-
+        // uniqueidentifier
         public Guid? CountryID { get; set; }
 
         [StringLength(200)]
         public string? Address { get; set; }
 
+        // bit
         public bool ReceiveNewsLetters { get; set; }
+
+        public string? TIN {  get; set; }
     }
 }
