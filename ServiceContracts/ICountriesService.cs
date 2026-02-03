@@ -1,4 +1,5 @@
-﻿using ServiceContracts.DTO;
+﻿using Microsoft.AspNetCore.Http;
+using ServiceContracts.DTO;
 
 namespace ServiceContracts
 {
@@ -27,5 +28,13 @@ namespace ServiceContracts
         /// <returns>A <see cref="CountryResponse"/> containing the country information if found; otherwise, null.</returns>
         Task<CountryResponse?> GetCountryByCountryID(Guid? countryID);
 
+        /// <summary>
+        /// Uploads country data from the specified Excel file and adds the countries to the system asynchronously.
+        /// </summary>
+        /// <param name="formFile">The Excel file containing country data to upload. The file must be a valid Excel document and cannot be
+        /// null.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the number of countries
+        /// successfully uploaded.</returns>
+        Task<int> UploadCountriesFromExcelFile(IFormFile formFile);
     }
 }
