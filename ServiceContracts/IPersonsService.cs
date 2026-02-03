@@ -68,5 +68,12 @@ namespace ServiceContracts
         /// </summary>
         /// <returns>Returns the memory stream with CSV</returns>
         Task<MemoryStream> GetPersonsCSV();
+
+        /// <summary>
+        /// Generates an Excel file containing a list of persons and returns it as a memory stream.
+        /// </summary>
+        /// <returns>A <see cref="MemoryStream"/> containing the Excel file data for the persons list. The stream is positioned
+        /// at the beginning.</returns>
+        Task<MemoryStream> GetPersonsExcel();
     }
 }
