@@ -62,5 +62,11 @@ namespace ServiceContracts
         /// <param name="personID">The unique identifier of the person to delete. If null, the method does not perform any operation.</param>
         /// <returns>true if the person was found and deleted; otherwise, false.</returns>
         Task<bool> DeletePerson(Guid? personID);
+
+        /// <summary>
+        /// Return persons as CSV
+        /// </summary>
+        /// <returns>Returns the memory stream with CSV</returns>
+        Task<MemoryStream> GetPersonsCSV();
     }
 }
