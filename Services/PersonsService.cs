@@ -44,8 +44,7 @@ namespace Services
             person.PersonID = Guid.NewGuid();
 
             // Then add it into Database
-            _db.Persons.Add(person);
-            _db.SaveChanges();
+            _db.sp_InsertPerson(person);
 
             // Return PersonResponse object with generated PersonID and other details
             return ConvertPersonIntoPersonResponse(person);
@@ -53,7 +52,7 @@ namespace Services
 
         public List<PersonResponse> GetAllPersons()
         {
-            return _db.Persons.ToList().Select(person => ConvertPersonIntoPersonResponse(person)).ToList();
+            return _db.sp_GetAllPersons().Select(person => ConvertPersonIntoPersonResponse(person)).ToList();
         }
 
         public PersonResponse? GetPersonByPersonID(Guid? personID)
