@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Microsoft.EntityFrameworkCore;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using ServiceContracts.Enums;
@@ -17,13 +18,6 @@ namespace Services
         {
             _db = personsDbContext;
             _countriesService = countriesService;
-        }
-
-        private PersonResponse ConvertPersonIntoPersonResponse(Person person)
-        {
-            PersonResponse personResponse = person.ToPersonResponse();
-            personResponse.Country = _countriesService.GetCountryByCountryID(person.CountryID)?.CountryName;
-            return personResponse;
         }
 
         public PersonResponse AddPerson(PersonAddRequest? personAddRequest)
@@ -48,12 +42,14 @@ namespace Services
             _db.SaveChanges();
 
             // Return PersonResponse object with generated PersonID and other details
-            return ConvertPersonIntoPersonResponse(person);
+            return person.ToPersonResponse();
         }
 
         public List<PersonResponse> GetAllPersons()
         {
-            return _db.Persons.ToList().Select(person => ConvertPersonIntoPersonResponse(person)).ToList();
+            var persons = _db.Persons.Include("Country").ToList();
+
+            return persons.Select(person => person.ToPersonResponse()).ToList();
         }
 
         public PersonResponse? GetPersonByPersonID(Guid? personID)
@@ -63,12 +59,12 @@ namespace Services
                 return null;
 
             // Get matching person from Database based personID
-            Person? person = _db.Persons.FirstOrDefault(person => person.PersonID == personID);
+            Person? person = _db.Persons.Include("Country").FirstOrDefault(person => person.PersonID == personID);
             if (person == null)
                 return null;
 
             // Convert matching person object to PersonResponse and returns it
-            return ConvertPersonIntoPersonResponse(person);
+            return person.ToPersonResponse();
         }
 
         public List<PersonResponse> GetFilteredPersons(string searchBy, string? searchString)
@@ -230,7 +226,7 @@ namespace Services
             _db.SaveChanges();
 
             // Convert the person object to PersonResponse object and return it
-            return ConvertPersonIntoPersonResponse(matchingPerson);
+            return matchingPerson.ToPersonResponse();
         }
 
         public bool DeletePerson(Guid? personID)
