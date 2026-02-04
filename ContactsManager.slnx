@@ -1,6 +1,6 @@
 <Solution>
   <Project Path="ContactsManager/ContactsManager.csproj" />
-  <Project Path="CRUDTests/CRUDTests.csproj" />
+  <Project Path="CRUDTests/ContactsManagerTests.csproj" />
   <Project Path="Entities/Entities.csproj" />
   <Project Path="ServiceContracts/ServiceContracts.csproj" />
   <Project Path="Services/Services.csproj" />
