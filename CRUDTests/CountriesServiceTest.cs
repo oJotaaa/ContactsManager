@@ -1,34 +1,38 @@
-﻿using Azure.Core;
+﻿using AutoFixture;
+using Azure.Core;
 using Entities;
 using EntityFrameworkCoreMock;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using RepositoryContracts;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using Services;
+using System.Diagnostics.Metrics;
 
 namespace CRUDTests
 {
     public class CountriesServiceTest
     {
+        // Private fields
         private readonly ICountriesService _countriesService;
+        private readonly Mock<ICountriesRepository> _countrieRepositoryMock;
+        private readonly ICountriesRepository _countriesRepository;
+        private readonly IFixture _fixture;
 
         public CountriesServiceTest()
         {
-            var countriesInitialData = new List<Country>() { };
-            DbContextMock<ApplicationDbContext> dbContextMock = new DbContextMock<ApplicationDbContext>(new DbContextOptionsBuilder<ApplicationDbContext>().Options);
-
-            var dbContext = dbContextMock.Object;
-            dbContextMock.CreateDbSetMock(temp => temp.Countries, countriesInitialData);
-
-            _countriesService = new CountriesService(dbContext);
+            _fixture = new Fixture();
+            _countrieRepositoryMock = new Mock<ICountriesRepository>();
+            _countriesRepository = _countrieRepositoryMock.Object;
+            _countriesService = new CountriesService(_countriesRepository);
         }
 
         #region AddCountryTests
         // When CountryAddRequest is null, AddCountry should throw ArgumentNullException
         [Fact]
-        public async Task AddCountry_NullCountry()
+        public async Task AddCountry_NullCountry_ToBeArgumentNullException()
         {
             // Arrange
             CountryAddRequest? request = null;
@@ -46,15 +50,21 @@ namespace CRUDTests
 
         // When the CountryName is null or empty, AddCountry should throw ArgumentException
         [Fact]
-        public async Task AddCountry_CountryNameIsNull()
+        public async Task AddCountry_CountryNameIsNull_ToBeArgumentException()
         {
             // Arrange
-            CountryAddRequest? request = new CountryAddRequest() { CountryName = null };
+            CountryAddRequest? countryAddRequest = _fixture.Build<CountryAddRequest>()
+                .With(temp => temp.CountryName, null as string)
+                .Create();
+
+            // Mock
+            Country country = countryAddRequest.ToCountry();
+            _countrieRepositoryMock.Setup(temp => temp.AddCountry(It.IsAny<Country>())).ReturnsAsync(country);
 
             // Act
             Func<Task> action = async () =>
             {
-                await _countriesService.AddCountry(request);
+                await _countriesService.AddCountry(countryAddRequest);
             };
 
             // Assert
@@ -63,11 +73,16 @@ namespace CRUDTests
 
         // When the CountryName is duplicate, AddCountry should throw ArgumentException
         [Fact]
-        public async Task AddCountry_DuplicateCountryName()
+        public async Task AddCountry_DuplicateCountryName_ToBeArgumentException()
         {
             // Arrange
-            CountryAddRequest? request1 = new CountryAddRequest() { CountryName = "USA" };
-            CountryAddRequest? request2 = new CountryAddRequest() { CountryName = "USA" };
+            CountryAddRequest? request1 = _fixture.Create<CountryAddRequest>();
+            CountryAddRequest? request2 = _fixture.Create<CountryAddRequest>();
+
+            // Mock
+            Country country = request1.ToCountry();
+            _countrieRepositoryMock.Setup(temp => temp.AddCountry(It.IsAny<Country>())).ReturnsAsync(country);
+            _countrieRepositoryMock.Setup(temp => temp.GetCountryByCountryName(It.IsAny<string>())).ReturnsAsync(country);
 
             // Act
             Func<Task> action = async () =>
@@ -82,18 +97,23 @@ namespace CRUDTests
 
         // When you supply proper country name, AddCountry should return CountryResponse with valid CountryID
         [Fact]
-        public async Task AddCountry_ProperCountryDetailsl()
+        public async Task AddCountry_FullCountryDetails_ToBeSuccessful()
         {
             // Arrange
-            CountryAddRequest? request = new CountryAddRequest() { CountryName = "Japan" };
+            CountryAddRequest? request = _fixture.Create<CountryAddRequest>();
+
+            // Mock
+            Country country = request.ToCountry();
+            CountryResponse countryResponseExpected = country.ToCountryResponse(); 
+            _countrieRepositoryMock.Setup(temp => temp.AddCountry(It.IsAny<Country>())).ReturnsAsync(country);
 
             // Act
-            CountryResponse response = await _countriesService.AddCountry(request);
-            List<CountryResponse> all_countries = await _countriesService.GetAllCountries();
+            CountryResponse responseFromAdd = await _countriesService.AddCountry(request);
+            countryResponseExpected.CountryID = responseFromAdd.CountryID;
 
             // Assert
-            response.CountryID.Should().NotBe(Guid.Empty);
-            all_countries.Should().Contain(response);
+            responseFromAdd.CountryID.Should().NotBe(Guid.Empty);
+            responseFromAdd.Should().Be(countryResponseExpected);
         }
 
         #endregion
@@ -102,8 +122,12 @@ namespace CRUDTests
 
         // The list of countries should be empty by default (before adding any country)
         [Fact]
-        public async Task GetAllCountries_EmptyList()
+        public async Task GetAllCountries_EmptyList_ToBeSuccessful()
         {
+            // Arrange
+            var countries = new List<Country>();
+            _countrieRepositoryMock.Setup(temp => temp.GetAllCountries()).ReturnsAsync(countries);
+
             // Acts
             List<CountryResponse> actual_country_response_list = await _countriesService.GetAllCountries();
 
@@ -113,27 +137,26 @@ namespace CRUDTests
 
         // The getAllCountries should return all countries added via AddCountry
         [Fact]
-        public async Task GetAllCountries_AddFewCountries()
+        public async Task GetAllCountries_WithFewCountries_ToBeSuccessful()
         {
             // Arrange
-            List<CountryAddRequest> country_request_list = new List<CountryAddRequest>()
+            List<Country> countries = new List<Country>()
             {
-                new CountryAddRequest() { CountryName = "USA" },
-                new CountryAddRequest() { CountryName = "UK" },
+                _fixture.Create<Country>(),
+                _fixture.Create<Country>(),
+                _fixture.Create<Country>()
             };
 
             // Act
-            List<CountryResponse> country_list_from_add_country = new List<CountryResponse>();
+            List<CountryResponse> CountrieListResponseExpected = countries.Select(temp => temp.ToCountryResponse()).ToList();
 
-            foreach (CountryAddRequest country_request in country_request_list)
-            {
-                country_list_from_add_country.Add(await _countriesService.AddCountry(country_request));
-            }
+            // Mock
+            _countrieRepositoryMock.Setup(temp => temp.GetAllCountries()).ReturnsAsync(countries);
 
             List<CountryResponse> actualCountryResponseList = await _countriesService.GetAllCountries();
 
             // Assert
-            actualCountryResponseList.Should().BeEquivalentTo(country_list_from_add_country);
+            actualCountryResponseList.Should().BeEquivalentTo(CountrieListResponseExpected);
         }
 
         #endregion
@@ -142,7 +165,7 @@ namespace CRUDTests
 
         // If we supply null countryID, GetCountryByCountryID should return null
         [Fact]
-        public async Task GetCountryByCountryID_NullCountryID()
+        public async Task GetCountryByCountryID_NullCountryID_ToBeNull()
         {
             // Arrange
             Guid? countrID = null;
@@ -159,14 +182,17 @@ namespace CRUDTests
         public async Task GetCountryByCountryID_ValidCountryID()
         {
             // Arrange
-            CountryAddRequest? countryAddRequest = new CountryAddRequest() { CountryName = "China" };
-            CountryResponse countryResponseFromAddCountry = await _countriesService.AddCountry(countryAddRequest);
+            Country country = _fixture.Create<Country>();
+            CountryResponse CountryResponseExpected = country.ToCountryResponse();
+
+            // Mock
+            _countrieRepositoryMock.Setup(temp => temp.GetCountryByCountryID(It.IsAny<Guid>())).ReturnsAsync(country);
 
             // Act
-            CountryResponse? countryResponseFromGet = await _countriesService.GetCountryByCountryID(countryResponseFromAddCountry.CountryID);
+            CountryResponse? countryResponseFromGet = await _countriesService.GetCountryByCountryID(country.CountryID);
 
             // Assert
-            countryResponseFromGet.Should().Be(countryResponseFromAddCountry);
+            countryResponseFromGet.Should().Be(CountryResponseExpected);
         }
         #endregion
     }

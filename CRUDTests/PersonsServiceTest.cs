@@ -149,7 +149,7 @@ namespace CRUDTests
 
         // The GetAllPersons should return an empty list when there are no persons added
         [Fact]
-        public async Task GetAllPersons_EmptyList()
+        public async Task GetAllPersons_EmptyList_ToBeSuccessful()
         {
             // Arrange
             var persons = new List<Person>();
