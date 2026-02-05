@@ -67,7 +67,7 @@ namespace ContactsManager.Controllers
                 List<CountryResponse> countries = await _countriesService.GetAllCountries();
                 ViewBag.Countries = countries;
                 ViewBag.Errors = ModelState.Values.SelectMany(v => v.Errors).SelectMany(e => e.ErrorMessage).ToList();
-                return View();
+                return View(personAddRequest);
             }
 
             // Call the service method
