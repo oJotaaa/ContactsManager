@@ -1,10 +1,12 @@
-﻿using ServiceContracts;
-using Services;
-using ServiceContracts.DTO;
-using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
 using Entities;
-using Moq;
 using EntityFrameworkCoreMock;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using ServiceContracts;
+using ServiceContracts.DTO;
+using Services;
 
 namespace CRUDTests
 {
@@ -31,8 +33,14 @@ namespace CRUDTests
             // Arrange
             CountryAddRequest? request = null;
 
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await _countriesService.AddCountry(request));
+            // Act
+            Func<Task> action = async () =>
+            {
+                await _countriesService.AddCountry(request);
+            };
+
+            // Assert
+            await action.Should().ThrowAsync<ArgumentNullException>();
         }
 
 
@@ -43,8 +51,14 @@ namespace CRUDTests
             // Arrange
             CountryAddRequest? request = new CountryAddRequest() { CountryName = null };
 
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _countriesService.AddCountry(request));
+            // Act
+            Func<Task> action = async () =>
+            {
+                await _countriesService.AddCountry(request);
+            };
+
+            // Assert
+            await action.Should().ThrowAsync<ArgumentException>();
         }
 
         // When the CountryName is duplicate, AddCountry should throw ArgumentException
@@ -55,12 +69,15 @@ namespace CRUDTests
             CountryAddRequest? request1 = new CountryAddRequest() { CountryName = "USA" };
             CountryAddRequest? request2 = new CountryAddRequest() { CountryName = "USA" };
 
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            // Act
+            Func<Task> action = async () =>
             {
                 await _countriesService.AddCountry(request1);
                 await _countriesService.AddCountry(request2);
-            });
+            };
+
+            // Assert
+            await action.Should().ThrowAsync<ArgumentException>();
         }
 
         // When you supply proper country name, AddCountry should return CountryResponse with valid CountryID
@@ -75,8 +92,8 @@ namespace CRUDTests
             List<CountryResponse> all_countries = await _countriesService.GetAllCountries();
 
             // Assert
-            Assert.True(response.CountryID != Guid.Empty);
-            Assert.Contains(response, all_countries);
+            response.CountryID.Should().NotBe(Guid.Empty);
+            all_countries.Should().Contain(response);
         }
 
         #endregion
@@ -91,7 +108,7 @@ namespace CRUDTests
             List<CountryResponse> actual_country_response_list = await _countriesService.GetAllCountries();
 
             // Assert
-            Assert.Empty(actual_country_response_list);
+            actual_country_response_list.Should().BeEmpty();
         }
 
         // The getAllCountries should return all countries added via AddCountry
@@ -116,11 +133,7 @@ namespace CRUDTests
             List<CountryResponse> actualCountryResponseList = await _countriesService.GetAllCountries();
 
             // Assert
-            // Read each element from country_list_from_add_country
-            foreach (CountryResponse expected_country in country_list_from_add_country)
-            {
-                Assert.Contains(expected_country, actualCountryResponseList);
-            }
+            actualCountryResponseList.Should().BeEquivalentTo(country_list_from_add_country);
         }
 
         #endregion
@@ -138,7 +151,7 @@ namespace CRUDTests
             CountryResponse? countryResponse = await _countriesService.GetCountryByCountryID(countrID);
 
             // Assert
-            Assert.Null(countryResponse);
+            countryResponse.Should().BeNull();
         }
 
         // If we supply a valid countryID, it should return the corresponding CountryResponse object
@@ -153,7 +166,7 @@ namespace CRUDTests
             CountryResponse? countryResponseFromGet = await _countriesService.GetCountryByCountryID(countryResponseFromAddCountry.CountryID);
 
             // Assert
-            Assert.Equal(countryResponseFromAddCountry, countryResponseFromGet);
+            countryResponseFromGet.Should().Be(countryResponseFromAddCountry);
         }
         #endregion
     }
