@@ -22,20 +22,26 @@ namespace Entities
             modelBuilder.Entity<Person>().ToTable("Persons");
 
             // Seed to Countries
-            string countriesJson = File.ReadAllText("countries.json");
-            List<Country>? countries = JsonSerializer.Deserialize<List<Country>>(countriesJson);
-
-            foreach (Country country in countries!)
+            if (File.Exists("countries.json"))
             {
-                modelBuilder.Entity<Country>().HasData(country);
+                string countriesJson = File.ReadAllText("countries.json");
+                List<Country>? countries = JsonSerializer.Deserialize<List<Country>>(countriesJson);
+
+                foreach (Country country in countries!)
+                {
+                    modelBuilder.Entity<Country>().HasData(country);
+                }
             }
 
-            string personsJson = File.ReadAllText("persons.json");
-            List<Person>? persons = JsonSerializer.Deserialize<List<Person>>(personsJson);
-
-            foreach (Person person in persons!)
+            if (File.Exists("persons.json"))
             {
-                modelBuilder.Entity<Person>().HasData(person);
+                string personsJson = File.ReadAllText("persons.json");
+                List<Person>? persons = JsonSerializer.Deserialize<List<Person>>(personsJson);
+
+                foreach (Person person in persons!)
+                {
+                    modelBuilder.Entity<Person>().HasData(person);
+                }
             }
 
             // Fluent API
