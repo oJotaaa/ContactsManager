@@ -1,5 +1,6 @@
 ﻿using Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RepositoryContracts;
 using System;
 using System.Collections.Generic;
@@ -11,14 +12,18 @@ namespace Repositories
     public class PersonsRepository : IPersonsRepository
     {
         private readonly ApplicationDbContext _db;
+        private readonly ILogger<PersonsRepository> _logger;
 
-        public PersonsRepository(ApplicationDbContext db)
+        public PersonsRepository(ApplicationDbContext db, ILogger<PersonsRepository> logger)
         {
             _db = db;
+            _logger = logger;
         }
 
         public async Task<Person> AddPerson(Person person)
         {
+            _logger.LogInformation("AddPerson of PersonsRepository");
+
             await _db.Persons.AddAsync(person);
             await _db.SaveChangesAsync();
 
@@ -27,6 +32,8 @@ namespace Repositories
 
         public async Task<bool> DeletePersonByPersonID(Guid personID)
         {
+            _logger.LogInformation("DeletePersonByPersonID of PersonsRepository");
+
             _db.Persons.RemoveRange(_db.Persons.Where(temp => temp.PersonID == personID));
             int rowsDeleted = await _db.SaveChangesAsync();
             return rowsDeleted > 0;
@@ -34,11 +41,15 @@ namespace Repositories
 
         public async Task<List<Person>> GetAllPersons()
         {
+            _logger.LogInformation("GetAllPersons of PersonsRepository");
+
             return await _db.Persons.Include("Country").ToListAsync();
         }
 
         public async Task<List<Person>> GetFilteredPersons(Expression<Func<Person, bool>> predicate)
         {
+            _logger.LogInformation("GetFilteredPersons of PersonsRepository");
+
             return await _db.Persons.Include("Country")
                 .Where(predicate)
                 .ToListAsync();
@@ -46,12 +57,16 @@ namespace Repositories
 
         public async Task<Person?> GetPersonByPersonID(Guid personID)
         {
+            _logger.LogInformation("GetPersonByPersonID of PersonsRepository");
+
             return await _db.Persons.Include("Country")
                 .FirstOrDefaultAsync(temp => temp.PersonID == personID);
         }
 
         public async Task<Person> UpdatePerson(Person person)
         {
+            _logger.LogInformation("UpdatePerson of PersonsRepository");
+
             Person? matchingPerson = await _db.Persons.FirstOrDefaultAsync(temp => temp.PersonID == person.PersonID);
 
             if (matchingPerson == null)
