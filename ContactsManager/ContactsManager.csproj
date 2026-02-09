@@ -13,6 +13,10 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
     <PackageReference Include="Rotativa.AspNetCore" Version="1.4.0" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="9.0.2" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +27,9 @@
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 	<ItemGroup>
-		<InternalsVisibleTo Include="ContactsManagerTests"/>
+		<InternalsVisibleTo Include="ContactsManagerTests" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="logs\" />
 	</ItemGroup>
 </Project>
