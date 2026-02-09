@@ -32,6 +32,8 @@ namespace Services
 
         public async Task<PersonResponse> AddPerson(PersonAddRequest? personAddRequest)
         {
+            _logger.LogInformation("GetFilteredPersons of PersonsService");
+
             // Check if "personAddRequest" is not null
             if (personAddRequest == null)
             {
@@ -65,6 +67,8 @@ namespace Services
 
         public async Task<PersonResponse?> GetPersonByPersonID(Guid? personID)
         {
+            _logger.LogInformation("GetPersonByPersonID of PersonsService");
+
             // Check if "personID" is null
             if (personID == null)
                 return null;
@@ -191,6 +195,8 @@ namespace Services
 
         public async Task<PersonResponse> UpdatePerson(PersonUpdateRequest? personUpdateRequest)
         {
+            _logger.LogInformation("UpdatePerson of PersonsService");
+
             // Check if "personUpdateRequest" is not null
             if (personUpdateRequest == null)
                 throw new ArgumentNullException(nameof(personUpdateRequest), "PersonUpdateRequest cannot be null");
@@ -224,6 +230,8 @@ namespace Services
 
         public async Task<bool> DeletePerson(Guid? personID)
         {
+            _logger.LogInformation("DeletePerson of PersonsService");
+
             // Check if "personID" is null
             if (personID == null)
                 return false;
@@ -244,6 +252,8 @@ namespace Services
 
         public async Task<MemoryStream> GetPersonsCSV()
         {
+            _logger.LogInformation("GetPersonsCSV of PersonsService");
+
             MemoryStream memoryStream = new MemoryStream();
             StreamWriter streamWriter = new StreamWriter(memoryStream);
 
@@ -286,6 +296,8 @@ namespace Services
 
         public async Task<MemoryStream> GetPersonsExcel()
         {
+            _logger.LogInformation("GetPersonsExcel of PersonsService");
+
             MemoryStream memoryStream = new MemoryStream();
             using (ExcelPackage excelPackage = new ExcelPackage(memoryStream)) 
             {
