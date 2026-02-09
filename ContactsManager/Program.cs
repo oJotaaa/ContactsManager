@@ -4,8 +4,19 @@ using Repositories;
 using RepositoryContracts;
 using ServiceContracts;
 using Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Serilog
+builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, LoggerConfiguration loggerConfiguration) =>
+{
+    loggerConfiguration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services);
+
+});
+
 builder.Services.AddControllersWithViews();
 
 // Add services into IoC container
@@ -22,7 +33,14 @@ if (builder.Environment.EnvironmentName != "Test")
     });
 }
 
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.RequestProperties | Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.ResponseHeaders;
+});
+
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 if (builder.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
@@ -30,6 +48,7 @@ if (builder.Environment.IsDevelopment())
 if (builder.Environment.IsEnvironment("Test") == false)
     Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
 
+app.UseHttpLogging();
 app.UseStaticFiles();
 app.UseRouting();
 app.MapControllers();
