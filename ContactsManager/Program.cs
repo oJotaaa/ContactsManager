@@ -5,6 +5,8 @@ using RepositoryContracts;
 using ServiceContracts;
 using Services;
 using Serilog;
+using ContactsManager.Filters.ActionFilters;
+using ContactsManager;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,26 +19,7 @@ builder.Host.UseSerilog((HostBuilderContext context, IServiceProvider services, 
 
 });
 
-builder.Services.AddControllersWithViews();
-
-// Add services into IoC container
-builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
-builder.Services.AddScoped<IPersonsRepository, PersonsRepository>();
-builder.Services.AddScoped<ICountriesService, CountriesService>();
-builder.Services.AddScoped<IPersonsService, PersonsService>();
-
-if (builder.Environment.EnvironmentName != "Test")
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    });
-}
-
-builder.Services.AddHttpLogging(options =>
-{
-    options.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.RequestProperties | Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.ResponseHeaders;
-});
+builder.Services.ConfigureServices(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 
