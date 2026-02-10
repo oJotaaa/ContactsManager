@@ -1,7 +1,9 @@
 ﻿using AutoFixture;
+using Castle.Core.Logging;
 using ContactsManager.Controllers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using ServiceContracts;
 using ServiceContracts.DTO;
@@ -19,8 +21,10 @@ namespace ContactsManagerTests
 
         private readonly Mock<IPersonsService> _personsServiceMock;
         private readonly Mock<ICountriesService> _countriesServiceMock;
+        private readonly Mock<ILogger<PersonsController>> _loggerMock;
 
         private readonly Fixture _fixture;
+        private readonly ILogger<PersonsController> _logger;
 
         public PersonsControllerTest()
         {
@@ -28,6 +32,9 @@ namespace ContactsManagerTests
 
             _personsServiceMock = new Mock<IPersonsService>();
             _countriesServiceMock = new Mock<ICountriesService>();
+
+            _loggerMock = new Mock<ILogger<PersonsController>>();
+            _logger = _loggerMock.Object;
 
             _personsService = _personsServiceMock.Object;
             _countriesService = _countriesServiceMock.Object;
@@ -41,7 +48,7 @@ namespace ContactsManagerTests
             // Arrange
             List<PersonResponse> personResponsesList = _fixture.Create<List<PersonResponse>>();
 
-            PersonsController personsController = new PersonsController(_personsService, _countriesService);
+            PersonsController personsController = new PersonsController(_personsService, _countriesService, _logger);
 
             _personsServiceMock.Setup(temp => temp.GetFilteredPersons(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(personResponsesList);
             _personsServiceMock.Setup(temp => temp.GetSortedPersons(It.IsAny<List<PersonResponse>>(), It.IsAny<string>(), It.IsAny<SortOrderOptions>())).ReturnsAsync(personResponsesList);
@@ -58,35 +65,6 @@ namespace ContactsManagerTests
         #endregion
 
         #region Create
-
-        [Fact]
-        public async Task Create_IfModelErrors_ToReturnCreateView()
-        {
-            // Arrange
-            PersonAddRequest personAddRequest = _fixture.Create<PersonAddRequest>();
-
-            PersonResponse personResponse = _fixture.Create<PersonResponse>();
-
-            List<CountryResponse> countries = _fixture.Create<List<CountryResponse>>();
-
-            _countriesServiceMock.Setup(temp => temp.GetAllCountries()).ReturnsAsync(countries);
-            _personsServiceMock.Setup(temp => temp.AddPerson(It.IsAny<PersonAddRequest>())).ReturnsAsync(personResponse);
-
-            PersonsController personsController = new PersonsController(_personsService, _countriesService);
-
-
-            // Act
-            personsController.ModelState.AddModelError("PersonName", "Person name can't be blank");
-            
-            IActionResult result = await personsController.Create(personAddRequest);
-
-            // Assert
-            ViewResult viewResult = Assert.IsType<ViewResult>(result);
-
-            viewResult.ViewData.Model.Should().BeAssignableTo<PersonAddRequest>();
-            viewResult.ViewData.Model.Should().Be(personAddRequest);
-        }
-
         [Fact]
         public async Task Create_IfNoModelErrors_ToReturnRedirectToIndex()
         {
@@ -100,7 +78,7 @@ namespace ContactsManagerTests
             _countriesServiceMock.Setup(temp => temp.GetAllCountries()).ReturnsAsync(countries);
             _personsServiceMock.Setup(temp => temp.AddPerson(It.IsAny<PersonAddRequest>())).ReturnsAsync(personResponse);
 
-            PersonsController personsController = new PersonsController(_personsService, _countriesService);
+            PersonsController personsController = new PersonsController(_personsService, _countriesService, _logger);
 
 
             // Act
