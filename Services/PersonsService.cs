@@ -12,6 +12,7 @@ using ServiceContracts.Enums;
 using Services.Helpers;
 using System.Globalization;
 using SerilogTimings;
+using Exceptions;
 
 namespace Services
 {
@@ -210,7 +211,7 @@ namespace Services
             // Check if matching "Person" object is not null
             if (matchingPerson == null)
             {
-                throw new ArgumentException($"Person with PersonID '{personUpdateRequest.PersonID}' not found");
+                throw new InvalidPersonIDException($"Person with PersonID '{personUpdateRequest.PersonID}' not found");
             }
 
             // Update all details from "personUpdateRequest" to matching "Person" object
