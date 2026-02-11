@@ -7,6 +7,7 @@ using Services;
 using Serilog;
 using ContactsManager.Filters.ActionFilters;
 using ContactsManager;
+using ContactsManager.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,14 @@ var app = builder.Build();
 app.UseSerilogRequestLogging();
 
 if (builder.Environment.IsDevelopment())
+{
     app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandleMiddleware();
+}
 
 if (builder.Environment.IsEnvironment("Test") == false)
     Rotativa.AspNetCore.RotativaConfiguration.Setup("wwwroot", wkhtmltopdfRelativePath: "Rotativa");
