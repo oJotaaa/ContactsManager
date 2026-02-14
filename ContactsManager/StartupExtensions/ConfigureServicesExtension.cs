@@ -18,8 +18,15 @@ namespace ContactsManager
             // Add services into IoC container
             services.AddScoped<ICountriesRepository, CountriesRepository>();
             services.AddScoped<IPersonsRepository, PersonsRepository>();
-            services.AddScoped<ICountriesService, CountriesService>();
-            services.AddScoped<IPersonsService, PersonsService>();
+            services.AddScoped<ICountriesGetterService, CountriesGetterService>();
+            services.AddScoped<ICountriesAdderService, CountriesAdderService>();
+            services.AddScoped<ICountriesUploaderService, CountriesUploaderService>();
+            services.AddScoped<IPersonsGetterService, PersonsGetterService>();
+            services.AddScoped<PersonsGetterServiceWithFewExcelFields, PersonsGetterServiceWithFewExcelFields>();
+            services.AddScoped<IPersonsAdderService, PersonsAdderService>();
+            services.AddScoped<IPersonsSorterService, PersonsSorterService>();
+            services.AddScoped<IPersonsUpdaterService, PersonsUpdaterService>();
+            services.AddScoped<IPersonsDeleterService, PersonsDeleterService>();
 
             if (webHostEnvironment.EnvironmentName != "Test")
             {
