@@ -7,12 +7,12 @@ namespace ContactsManager.Filters.ActionFilters
 {
     public class PersonCreateAndEditPostActionFilter : IAsyncActionFilter
     {
-        private readonly ICountriesService _countriesService;
+        private readonly ICountriesGetterService _countriesGetterService;
         private readonly ILogger<PersonCreateAndEditPostActionFilter> _logger;
 
-        public PersonCreateAndEditPostActionFilter(ICountriesService countriesService, ILogger<PersonCreateAndEditPostActionFilter> logger)
+        public PersonCreateAndEditPostActionFilter(ICountriesGetterService countriesGetterService, ILogger<PersonCreateAndEditPostActionFilter> logger)
         {
-            _countriesService = countriesService;
+            _countriesGetterService = countriesGetterService;
             _logger = logger;
         }
 
@@ -22,7 +22,7 @@ namespace ContactsManager.Filters.ActionFilters
             {
                 if (!personsController.ModelState.IsValid)
                 {
-                    List<CountryResponse> countries = await _countriesService.GetAllCountries();
+                    List<CountryResponse> countries = await _countriesGetterService.GetAllCountries();
                     personsController.ViewBag.Countries = countries;
                     personsController.ViewBag.Errors = personsController.ModelState.Values.SelectMany(v => v.Errors).SelectMany(e => e.ErrorMessage).ToList();
 
