@@ -7,15 +7,8 @@ namespace ServiceContracts
     /// Defines operations for managing person records, including adding new persons and retrieving all existing
     /// persons.
     /// </summary>
-    public interface IPersonsService
+    public interface IPersonsGetterService
     {
-        /// <summary>
-        /// Adds a new person into the list of persons. 
-        /// </summary>
-        /// <param name="personAddRequest">Person to Add</param>
-        /// <returns>Returns the same person details, along with newly generated PersonID</returns>
-        Task<PersonResponse> AddPerson(PersonAddRequest? personAddRequest);
-
         /// <summary>
         /// Returns all persons
         /// </summary>
@@ -39,29 +32,6 @@ namespace ServiceContracts
         /// <returns>A list of <see cref="PersonResponse"/> objects that match the search criteria. Returns an empty list if no
         /// persons are found.</returns>
         Task<List<PersonResponse>> GetFilteredPersons(string searchBy, string? searchString);
-
-        /// <summary>
-        /// Returns sorted list of persons
-        /// </summary>
-        /// <param name="allPersons">Represents list of persons to sort</param>
-        /// <param name="sortyBy">Name of the property (key), based on which the persons should be sorted</param>
-        /// <param name="sortOrder">ASC or DESC</param>
-        /// <returns>Returns sorted persons as PersonResponse list</returns>
-        Task<List<PersonResponse>> GetSortedPersons(List<PersonResponse> allPersons, string sortyBy, SortOrderOptions sortOrder);
-
-        /// <summary>
-        /// Updates the details of an existing person using the specified update request.
-        /// </summary>
-        /// <param name="personUpdateRequest">An object containing the update information for the person</param>
-        /// <returns>A response object containing the updated person details and the result of the update operation.</returns>
-        Task<PersonResponse> UpdatePerson(PersonUpdateRequest? personUpdateRequest);
-
-        /// <summary>
-        /// Deletes the person with the specified identifier from the data store.
-        /// </summary>
-        /// <param name="personID">The unique identifier of the person to delete. If null, the method does not perform any operation.</param>
-        /// <returns>true if the person was found and deleted; otherwise, false.</returns>
-        Task<bool> DeletePerson(Guid? personID);
 
         /// <summary>
         /// Return persons as CSV

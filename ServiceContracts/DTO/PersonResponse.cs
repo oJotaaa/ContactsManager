@@ -60,7 +60,7 @@ namespace ServiceContracts.DTO
                 PersonName = PersonName,
                 Email = Email,
                 DateOfBirth = DateOfBirth,
-                Gender = (GenderOptions)Enum.Parse(typeof(GenderOptions), Gender, true),
+                Gender = (GenderOptions)Enum.Parse<GenderOptions>(Gender!, true),
                 Address = Address,
                 CountryID = CountryID,
                 ReceiveNewsLetters = ReceiveNewsLetters
