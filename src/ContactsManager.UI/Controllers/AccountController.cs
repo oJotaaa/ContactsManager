@@ -65,6 +65,13 @@ namespace ContactsManager.UI.Controllers
                 }
                 else
                 {
+                    // Create the User role if it doesn't exist
+                    if (_roleManager.FindByNameAsync(UserTypeOptions.User.ToString()) is null)
+                    {
+                        ApplicationRole applicationRole = new ApplicationRole { Name = UserTypeOptions.User.ToString() };
+                        await _roleManager.CreateAsync(applicationRole);
+                    }
+
                     await _userManager.AddToRoleAsync(user, UserTypeOptions.User.ToString());
                 }
 
@@ -132,6 +139,7 @@ namespace ContactsManager.UI.Controllers
             return RedirectToAction(nameof(PersonsController.Index), "Persons");
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> IsEmailAlreadyRegistered(string email)
         {
             ApplicationUser? user = await _userManager.FindByEmailAsync(email);
