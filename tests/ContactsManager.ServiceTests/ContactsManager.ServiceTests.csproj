@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ContactsManager.Core\ContactsManager.Core.csproj" />
+    <ProjectReference Include="..\..\src\ContactsManager.Core\ContactsManager.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
