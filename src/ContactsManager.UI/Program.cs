@@ -42,6 +42,8 @@ if (builder.Environment.IsEnvironment("Test") == false)
 app.UseHttpLogging();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
