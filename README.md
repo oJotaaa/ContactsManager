@@ -2,7 +2,7 @@
 
 ## 📋 Visão Geral
 
-**Contacts Manager** é uma aplicação web moderna para gerenciamento de contatos, desenvolvida com **ASP.NET Core Razor Pages** e **.NET 10**. O projeto demonstra boas práticas de engenharia de software, incluindo arquitetura em camadas, padrões de design, testes automatizados e conformidade com princípios SOLID.
+**Contacts Manager** é uma aplicação web para gerenciamento de contatos, desenvolvida com **ASP.NET Core MVC** e **.NET 10**. O projeto demonstra boas práticas de engenharia de software, incluindo Clean Architecture, padrões de design, testes automatizados e conformidade com princípios SOLID.
 
 A aplicação permite que usuários autenticados criem, leiam, atualizem e deletem contatos, com suporte a filtros avançados, ordenação, exportação em CSV/Excel e geração de relatórios em PDF.
 
@@ -14,7 +14,7 @@ A aplicação permite que usuários autenticados criem, leiam, atualizem e delet
 - **CRUD Completo**: Criar, listar, editar e deletar contatos
 - **Busca e Filtros**: Filtrar contatos por múltiplos critérios
 - **Ordenação Dinâmica**: Ordenar contatos por qualquer campo (crescente/decrescente)
-- **Exportação de Dados**: 
+- **Exportação de Dados**:
   - Baixar contatos em formato CSV
   - Gerar planilhas Excel com formatação
   - Gerar relatórios em PDF
@@ -27,23 +27,22 @@ A aplicação permite que usuários autenticados criem, leiam, atualizem e delet
 - **Autorização**: Acesso restrito apenas para usuários autenticados
 - **Gerenciamento de Senhas**: Políticas de senha configuráveis
 
-### Funcionalidades Avançadas
+### Funcionalidades Técnicas
 - **Logging Estruturado**: Sistema de logs completo com Serilog
 - **Tratamento de Exceções**: Middleware centralizado para erros
 - **Filtros de Ação**: Filtros customizados para validação e processamento
-- **Relatórios Administrativos**: Páginas de administração para gerenciar dados
 
 ---
 
 ## 🏗️ Arquitetura e Estrutura
 
-O projeto segue uma **arquitetura em camadas** (Layered Architecture) com separação clara de responsabilidades:
+O projeto segue **Clean Architecture** com separação clara de responsabilidades e a regra de dependência respeitada: as camadas internas nunca conhecem as externas.
 
 ```
 ContactsManager/
 ├── src/
-│   ├── ContactsManager.UI/                  # Apresentação (Controllers, Views, Razor Pages)
-│   ├── ContactsManager.Core/                # Lógica de negócio e modelos
+│   ├── ContactsManager.UI/                  # Apresentação (Controllers, Views, Filters, Middleware)
+│   ├── ContactsManager.Core/                # Lógica de negócio (sem dependências externas)
 │   │   ├── Domain/
 │   │   │   ├── Entities/                    # Entidades de domínio (Person, Country)
 │   │   │   └── IdentityEntities/            # Entidades de autenticação
@@ -65,19 +64,18 @@ ContactsManager/
 
 1. **Repository Pattern**: Abstração de acesso a dados através de interfaces
 2. **Dependency Injection**: Injeção de dependências com IoC Container
-3. **Service Layer**: Lógica de negócio isolada em serviços
-4. **DTO (Data Transfer Objects)**: Separação entre modelos de domínio e transfer
-5. **Factory Pattern**: Utilizado em testes com `CustomWebApplicationFactory`
-6. **Middleware Pattern**: Tratamento centralizado de exceções
+3. **Service Layer**: Lógica de negócio isolada em serviços especializados
+4. **DTO (Data Transfer Objects)**: Separação entre modelos de domínio e transferência de dados
+5. **Middleware Pattern**: Tratamento centralizado de exceções
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
 ### Framework e Runtime
-- **[.NET 10](https://dotnet.microsoft.com/)** - Runtime mais recente
-- **[ASP.NET Core](https://docs.microsoft.com/aspnet/core/)** - Framework web
-- **[Razor Pages](https://docs.microsoft.com/aspnet/core/razor-pages/)** - Modelo de apresentação
+- **[.NET 10](https://dotnet.microsoft.com/)** - Runtime
+- **[ASP.NET Core MVC](https://docs.microsoft.com/aspnet/core/mvc/)** - Framework web
+- **[Razor Views](https://docs.microsoft.com/aspnet/core/mvc/views/razor/)** - Templates de apresentação
 
 ### Banco de Dados e ORM
 - **[SQL Server](https://www.microsoft.com/sql-server/)** - Banco de dados relacional
@@ -86,13 +84,12 @@ ContactsManager/
 
 ### Autenticação e Segurança
 - **[ASP.NET Core Identity](https://docs.microsoft.com/aspnet/core/security/authentication/identity/)** - Sistema de autenticação e autorização
-- **[Authorize Attribute](https://docs.microsoft.com/aspnet/core/security/authorization/simple/)** - Autorização declarativa
-- **[CSRF Protection](https://docs.microsoft.com/aspnet/core/security/anti-csrf/)** - Proteção contra ataques CSRF
+- **[CSRF Protection](https://docs.microsoft.com/aspnet/core/security/anti-csrf/)** - Proteção contra ataques CSRF via `AutoValidateAntiforgeryTokenAttribute`
 
 ### Logging e Observabilidade
 - **[Serilog](https://serilog.net/)** - Logging estruturado
 - **[Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore)** - Integração com ASP.NET Core
-- **[Serilog.Sinks.MSSqlServer](https://github.com/serilog/serilog-sinks-mssqlserver)** - Persistência em banco de dados
+- **[Serilog.Sinks.MSSqlServer](https://github.com/serilog/serilog-sinks-mssqlserver)** - Persistência de logs em banco de dados
 - **[Serilog.Sinks.Seq](https://github.com/serilog/serilog-sinks-seq)** - Visualização centralizada de logs
 
 ### Exportação de Dados
@@ -110,9 +107,7 @@ ContactsManager/
 ## 🚀 Funcionalidades Técnicas Destacadas
 
 ### Logging Estruturado
-O projeto implementa logging estruturado em múltiplas camadas.
-
-Logs são persistidos em:
+O projeto implementa logging estruturado em múltiplas camadas. Os logs são persistidos em:
 - **Console** (desenvolvimento)
 - **Arquivo** (rolling files por hora)
 - **SQL Server** (análise centralizada)
@@ -127,7 +122,7 @@ Filtros customizados para processamento de requisições:
 - `HandleExceptionFilter` - Captura e tratamento de exceções
 
 ### Serviços Especializados
-O projeto utiliza uma abordagem de serviços especializados:
+Em vez de um único `PersonsService` com todos os métodos, cada operação possui seu próprio serviço com responsabilidade única:
 
 ```csharp
 public class PersonsController : Controller
@@ -139,16 +134,6 @@ public class PersonsController : Controller
     private readonly IPersonsDeleterService _personsDeleterService;
     // ...
 }
-```
-
-Cada serviço tem uma responsabilidade bem definida, seguindo o **Single Responsibility Principle (SRP)**.
-
-### Autorização Declarativa
-Proteção automática de rotas:
-```csharp
-[Authorize]
-[Route("[controller]")]
-public class PersonsController : Controller { }
 ```
 
 ---
@@ -168,7 +153,7 @@ public class Person
     public string? Address { get; set; }
     public bool ReceiveNewsLetters { get; set; }
     public string? TIN { get; set; }
-    
+
     [ForeignKey("CountryID")]
     public virtual Country? Country { get; set; }
 }
@@ -188,8 +173,8 @@ public class Country
 ```csharp
 public class ApplicationUser : IdentityUser<Guid>
 {
-    // Herança do IdentityUser<Guid>
-    // Propriedades adicionais conforme necessário
+    // Herda de IdentityUser<Guid>
+    // Extensível para propriedades adicionais conforme necessário
 }
 ```
 
@@ -197,7 +182,7 @@ public class ApplicationUser : IdentityUser<Guid>
 
 ## 🧪 Testes Automatizados
 
-O projeto inclui **três tipos de testes**:
+O projeto inclui três tipos de testes:
 
 ### 1. Testes Unitários de Controller
 **Arquivo**: `tests/ContactsManager.ControllerTests/PersonsControllerTest.cs`
@@ -205,7 +190,6 @@ O projeto inclui **três tipos de testes**:
 - Testa métodos dos controllers isoladamente
 - Utiliza Moq para simular dependências
 - Verifica comportamentos esperados sem acessar banco de dados
-- Exemplo: Validar se Index retorna view correta
 
 ```csharp
 [Fact]
@@ -216,10 +200,10 @@ public async Task Index_WithoutSearchParameters_ReturnsAllPersons()
     _personsGetterServiceMock
         .Setup(s => s.GetFilteredPersons(It.IsAny<string>(), null))
         .ReturnsAsync(persons);
-    
+
     // Act
     var result = await _controller.Index("", null);
-    
+
     // Assert
     Assert.IsType<ViewResult>(result);
 }
@@ -229,16 +213,15 @@ public async Task Index_WithoutSearchParameters_ReturnsAllPersons()
 **Arquivo**: `tests/ContactsManager.ServiceTests/PersonsServiceTest.cs`
 
 - Testa lógica de negócio dos serviços
-- Valida cálculos, transformações e regras
-- Exemplo: Validar formatação de dados
+- Valida cálculos, transformações e regras de negócio
+- Utiliza AutoFixture para geração de dados e FluentAssertions para legibilidade
 
 ### 3. Testes de Integração
 **Arquivo**: `tests/ContactsManager.IntegrationTests/PersonsControllerIntegrationTest.cs`
 
-- Testa fluxo completo com banco de dados real
-- Utiliza `CustomWebApplicationFactory` para configuração
-- Simula requisições HTTP reais
-- Valida comportamento end-to-end
+- Testa o fluxo completo com banco de dados real
+- Utiliza `CustomWebApplicationFactory` para configuração do ambiente de teste
+- Simula requisições HTTP reais e valida comportamento end-to-end
 
 ---
 
@@ -263,7 +246,8 @@ dotnet restore
 ```
 
 3. **Configurar banco de dados**
-Edite a connection string em `appsettings.json`:
+
+Edite a connection string em `src/ContactsManager.UI/appsettings.json`:
 ```json
 "ConnectionStrings": {
     "DefaultConnection": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=ContactsDataBase;Integrated Security=True;"
@@ -289,17 +273,17 @@ A aplicação estará disponível em `https://localhost:5001` ou `http://localho
 ### Funcionalidades de Segurança Implementadas
 
 1. **Autenticação com Identity**
-   - Passwords hasheadas com algoritmo robusto
-   - Políticas de senha configuráveis
-   - Suporte a autenticação multi-fator (extensível)
+   - Senhas hasheadas com PBKDF2
+   - Políticas de senha configuráveis (comprimento mínimo, caracteres especiais etc.)
 
-2. **Autorização Baseada em Claims**
-   - Fallback policy requer autenticação
+2. **Autorização**
+   - Fallback policy global exige autenticação em toda a aplicação
    - Decoradores `[Authorize]` em controladores sensíveis
+   - Endpoints de autenticação (login/registro) explicitamente liberados com `[AllowAnonymous]`
 
 3. **Proteção CSRF**
    - Token anti-forgery automático em formulários
-   - Validação automática via `AutoValidateAntiforgeryTokenAttribute`
+   - Validação global via `AutoValidateAntiforgeryTokenAttribute`
 
 4. **HTTPS**
    - Redirecionamento automático para HTTPS
@@ -307,96 +291,80 @@ A aplicação estará disponível em `https://localhost:5001` ou `http://localho
 
 5. **Validação de Entrada**
    - Data Annotations em modelos
-   - Validação do lado servidor
+   - Validação no lado servidor antes de qualquer operação no banco
 
 ---
 
 ## 📈 Padrões de Desenvolvimento
 
-### SOLID Principles - Aplicação Prática
+### SOLID Principles — Aplicação Prática
 
-#### **S** - Single Responsibility Principle (SRP)
-Cada classe tem uma única responsabilidade bem definida:
+#### **S** — Single Responsibility Principle (SRP)
+Cada classe tem uma única responsabilidade bem definida. Em vez de um `PersonsService` monolítico, o domínio é dividido em serviços especializados:
 
 ```csharp
-// ✅ Cada serviço é responsável por uma operação específica
-public interface IPersonsGetterService 
-{
-    Task<List<PersonResponse>> GetAllPersons();
-    Task<PersonResponse?> GetPersonByPersonID(Guid? personID);
-    Task<List<PersonResponse>> GetFilteredPersons(string searchBy, string? searchString);
-    Task<MemoryStream> GetPersonsCSV();
-    Task<MemoryStream> GetPersonsExcel();
-}
-
-public interface IPersonsAdderService 
+public interface IPersonsAdderService
 {
     Task<PersonResponse> AddPerson(PersonAddRequest personRequest);
 }
 
-public interface IPersonsDeleterService 
+public interface IPersonsDeleterService
 {
     Task<bool> DeletePerson(Guid? personID);
 }
+
+public interface IPersonsSorterService
+{
+    Task<List<PersonResponse>> GetSortedPersons(
+        List<PersonResponse> allPersons,
+        string sortBy,
+        SortOrderOptions sortOrder);
+}
 ```
 
-Em vez de ter um único `PersonsService` com todos os métodos, cada serviço tem uma responsabilidade específica (Get, Add, Delete, Update, Sort).
-
-#### **O** - Open/Closed Principle (OCP)
-Classes abertas para extensão, mas fechadas para modificação:
+#### **O** — Open/Closed Principle (OCP)
+Novas implementações podem ser adicionadas sem modificar código existente:
 
 ```csharp
-// ✅ Novo tipo de filtro pode ser adicionado sem modificar código existente
+// Nova implementação pode ser criada sem alterar nenhum código já existente
 public interface IPersonsRepository
 {
     Task<List<Person>> GetFilteredPersons(string searchBy, string? searchString);
 }
 
-// Pode-se criar novos repositórios que implementam a interface
-// sem modificar código existente
-public class PersonsRepository : IPersonsRepository { }
+public class PersonsRepository : IPersonsRepository { /* implementação padrão */ }
 ```
 
-#### **L** - Liskov Substitution Principle (LSP)
-Subtipos podem substituir seus tipos base:
+#### **L** — Liskov Substitution Principle (LSP)
+Subtipos podem substituir seus tipos base sem alterar o comportamento esperado:
 
 ```csharp
-// ✅ Ambas as implementações podem ser usadas intercambiavelmente
-IPersonsGetterService service = new PersonsGetterService(_repository);
-IPersonsGetterService serviceWithFewFields = new PersonsGetterServiceWithFewExcelFields(_repository);
-
-// Ambas são injetadas nos controladores sem problemas
+// Ambas as implementações são intercambiáveis no IoC container
 services.AddScoped<IPersonsGetterService, PersonsGetterService>();
-services.AddScoped<PersonsGetterServiceWithFewExcelFields>();
+// ou
+services.AddScoped<IPersonsGetterService, PersonsGetterServiceWithFewExcelFields>();
 ```
 
-#### **I** - Interface Segregation Principle (ISP)
-Múltiplas interfaces específicas em vez de uma genérica:
+#### **I** — Interface Segregation Principle (ISP)
+Interfaces específicas por responsabilidade em vez de uma interface genérica única:
 
 ```csharp
-// ✅ Interfaces segregadas por responsabilidade
-public interface IPersonsGetterService { }      // Apenas leitura
-public interface IPersonsAdderService { }       // Apenas criação
-public interface IPersonsUpdaterService { }     // Apenas atualização
-public interface IPersonsDeleterService { }     // Apenas exclusão
-public interface IPersonsSorterService { }      // Apenas ordenação
-
-// Em vez de:
-// public interface IPersonsService { } // Todas as operações em uma interface
-
-// O controlador injeta apenas as dependências que precisa
+// ✅ O controlador injeta apenas as dependências que realmente precisa
 public PersonsController(
     IPersonsGetterService getterService,
     IPersonsAdderService adderService,
     IPersonsDeleterService deleterService
 )
+
+// ❌ Alternativa que foi evitada:
+// public PersonsController(IPersonsService service) // tudo em um
 ```
 
-#### **D** - Dependency Inversion Principle (DIP)
+#### **D** — Dependency Inversion Principle (DIP)
 Dependências em abstrações, não em implementações concretas:
 
 ```csharp
-// ✅ Depende de interface, não de classe concreta
+// ✅ Controller depende de interface, nunca da classe concreta
 public class PersonsController : Controller
 {
     private readonly IPersonsGetterService _personsGetterService;
@@ -410,61 +378,53 @@ public class PersonsController : Controller
         _countriesGetterService = countriesGetterService;
     }
 }
-
-// ✅ Injeção de dependência via IoC Container
-services.AddScoped<IPersonsRepository, PersonsRepository>();
-services.AddScoped<IPersonsGetterService, PersonsGetterService>();
 ```
 
 ---
 
-### Clean Architecture - Estrutura de Camadas
-
-O projeto implementa **Clean Architecture** com separação clara entre camadas:
+### Clean Architecture — Estrutura de Camadas
 
 #### **1. UI Layer (Apresentação)**
-Responsável apenas pela apresentação:
+Responsável por receber requisições e retornar respostas. Não contém lógica de negócio.
 ```
 ContactsManager.UI/
-├── Controllers/          # Lógica de roteamento e requisições
+├── Controllers/          # Roteamento e orquestração de requisições
 ├── Views/               # Templates Razor
-├── Filters/             # Filtros de requisição
-├── Middleware/          # Middleware customizado
-└── Program.cs           # Configuração de startup
+├── Filters/             # Filtros de requisição (Action, Resource, Exception)
+├── Middleware/          # Middleware customizado (ExceptionHandling, HttpLogging)
+└── Program.cs           # Configuração de startup e DI
 ```
 
 #### **2. Core Layer (Lógica de Negócio)**
-Contém a lógica pura sem dependências externas:
+Contém toda a lógica da aplicação. **Não possui nenhuma dependência de UI ou Infrastructure.**
 ```
 ContactsManager.Core/
 ├── Domain/
-│   ├── Entities/        # Modelos de domínio puros
+│   ├── Entities/        # Modelos de domínio (Person, Country)
 │   └── IdentityEntities/# Entidades de autenticação
-├── DTO/                 # Transferência de dados entre camadas
-├── ServiceContracts/    # Interfaces dos serviços
+├── DTO/                 # Objetos de transferência de dados entre camadas
+├── ServiceContracts/    # Interfaces que definem o contrato dos serviços
 ├── Enums/              # Enumerações do domínio
 └── Services/           # Implementação da lógica de negócio
 ```
 
-**Característica importante**: Esta camada **não tem nenhuma dependência** da UI ou Infrastructure.
-
 #### **3. Infrastructure Layer (Acesso a Dados)**
-Responsável pela comunicação com recursos externos:
+Responsável pela comunicação com recursos externos (banco de dados, arquivos etc.).
 ```
 ContactsManager.Infrastructure/
 ├── DbContext/           # Entity Framework Core DbContext
-├── Repositories/        # Padrão Repository para acesso a dados
-└── Migrations/          # Versionamento de schema
+├── Repositories/        # Implementação do padrão Repository
+└── Migrations/          # Versionamento de schema do banco
 ```
 
-#### **Fluxo de Requisição (Dependency Rule)**
+#### **Fluxo de Requisição**
 ```
 UI → Services (Core) → Repository (Infrastructure) → Database
 ↑                                                         ↓
 └─────────────────── Resposta em DTOs ←────────────────┘
 ```
 
-**Observação**: A dependência sempre flui **para dentro**, nunca para fora. O Core nunca conhece UI ou Infrastructure.
+A dependência sempre flui **para dentro**: UI conhece Core, Core não conhece ninguém. Infrastructure implementa contratos definidos pelo Core.
 
 ---
 
@@ -472,19 +432,18 @@ UI → Services (Core) → Repository (Infrastructure) → Database
 
 #### Exemplo 1: Separação de Responsabilidades
 ```csharp
-// ✅ PersonsController apenas orquestra requisições
+// ✅ Controller apenas orquestra — não contém lógica de negócio
 [HttpGet]
 [Route("[action]")]
 public async Task<IActionResult> Index(string searchBy, string? searchString)
 {
-    // Delega para o serviço apropriado
     List<PersonResponse> persons = await _personsGetterService
         .GetFilteredPersons(searchBy, searchString);
 
     return View(persons);
 }
 
-// ✅ PersonsGetterService encapsula lógica de negócio
+// ✅ Service encapsula lógica de negócio
 public class PersonsGetterService : IPersonsGetterService
 {
     private readonly IPersonsRepository _personsRepository;
@@ -495,11 +454,11 @@ public class PersonsGetterService : IPersonsGetterService
         List<Person> persons = await _personsRepository
             .GetFilteredPersons(searchBy, searchString);
 
-        return persons.Select(p => new PersonResponse 
-        { 
+        return persons.Select(p => new PersonResponse
+        {
             PersonID = p.PersonID,
             PersonName = p.PersonName,
-            // ... mapping
+            // ... mapeamento
         }).ToList();
     }
 }
@@ -526,16 +485,16 @@ public class PersonsRepository : IPersonsRepository
 
 #### Exemplo 2: DTOs Isolam Camadas
 ```csharp
-// ✅ A UI recebe apenas o DTO, não a entidade de domínio
+// ✅ A UI recebe apenas o DTO, nunca a entidade de domínio diretamente
 public record PersonResponse
 {
     public Guid PersonID { get; set; }
     public string? PersonName { get; set; }
     public string? Email { get; set; }
-    // ... apenas dados necessários
+    // ... apenas os dados necessários para a camada de apresentação
 }
 
-// ✅ A entidade de domínio permanece pura
+// ✅ A entidade de domínio permanece pura, sem acoplamento à UI
 public class Person
 {
     [Key]
@@ -544,23 +503,21 @@ public class Person
     public string? Email { get; set; }
     [ForeignKey("CountryID")]
     public virtual Country? Country { get; set; }
-
-    public override string ToString() { /* ... */ }
 }
 ```
 
 #### Exemplo 3: Dependency Injection Centralizado
 ```csharp
-// ✅ Configuração centralizada em ConfigureServicesExtension
+// ✅ Toda configuração de DI centralizada em uma extension method
 public static IServiceCollection ConfigureServices(
-    this IServiceCollection services, 
+    this IServiceCollection services,
     IConfiguration configuration)
 {
     // Repositories
     services.AddScoped<ICountriesRepository, CountriesRepository>();
     services.AddScoped<IPersonsRepository, PersonsRepository>();
 
-    // Services - Cada um com responsabilidade específica
+    // Services — cada um com responsabilidade específica
     services.AddScoped<IPersonsGetterService, PersonsGetterService>();
     services.AddScoped<IPersonsAdderService, PersonsAdderService>();
     services.AddScoped<IPersonsDeleterService, PersonsDeleterService>();
@@ -580,65 +537,34 @@ public static IServiceCollection ConfigureServices(
 
 ---
 
-### Clean Code Practices
+## 📝 Notas de Configuração
 
-- ✅ **Nomes significativos**: `GetFilteredPersons` é claro sobre o que faz
-- ✅ **Métodos pequenos e focados**: Cada método faz uma coisa bem
-- ✅ **Tratamento de erros apropriado**: Try-catch em pontos estratégicos
-- ✅ **Documentação com XML comments**: Em interfaces de serviço
-- ✅ **Sem code smells**: Sem duplicação, sem complexidade desnecessária
-- ✅ **KISS (Keep It Simple, Stupid)**: Código legível e direto
+### appsettings.json
+O arquivo de configuração inclui:
+- **Logging**: Múltiplos sinks (Console, File, SQL Server, Seq) com nível configurável
+- **Banco de Dados**: Connection string para SQL Server / LocalDB
+- **EPPlus**: Configuração de licença para manipulação de Excel
+- **Serilog**: Enriquecimento de logs com informações de contexto
 
----
+### Middleware Personalizado
+- `ExceptionHandleMiddleware`: Captura e loga exceções não tratadas, retornando resposta padronizada
+- `UseHttpLogging`: Log detalhado de requisições e respostas HTTP
 
-## 📚 Recursos para Aprendizado
-
-### Documentação Oficial
-- [Documentação do ASP.NET Core](https://docs.microsoft.com/aspnet/core/)
-- [Entity Framework Core](https://docs.microsoft.com/ef/core/)
-- [ASP.NET Core Identity](https://docs.microsoft.com/aspnet/core/security/authentication/identity/)
-- [Serilog Documentation](https://serilog.net/)
-
-### Padrões e Práticas
-- Clean Architecture
-- Repository Pattern
-- Dependency Injection
-- SOLID Principles
-- Domain-Driven Design
+### Filtros por Escopo
+O projeto implementa filtros nos diferentes pontos do pipeline do ASP.NET:
+- **Authorization Filters**: Validam permissões antes de qualquer processamento
+- **Resource Filters**: Processam requisições antes do model binding (`FeatureDisabledResourceFilter`)
+- **Action Filters**: Validam e transformam dados antes/depois das actions
+- **Exception Filters**: Tratam exceções de forma centralizada
+- **Result Filters**: Processam resultados antes de serem enviados ao cliente
 
 ---
 
-
-## 📞 Contato e Links
+## 📞 Contato
 
 - **GitHub**: [github.com/oJotaaa/ContactsManager](https://github.com/oJotaaa/ContactsManager)
 - **Licença**: MIT
 
 ---
 
-## 📝 Notas Adicionais
-
-### Estrutura de Configuração
-O arquivo `appsettings.json` inclui configurações para:
-- **Logging**: Múltiplos sinks (Console, File, SQL Server, Seq)
-- **Banco de Dados**: Connection strings
-- **EPPlus**: Licença para manipulação de Excel
-- **Serilog**: Nível de log e enriquecimento
-
-### Middleware Personalizado
-- `ExceptionHandleMiddleware`: Captura e loga exceções não tratadas
-- `UseHttpLogging`: Log detalhado de requisições HTTP
-
-### Filtros Especializados
-O projeto implementa filtros em diferentes escopos:
-- **Authorization Filters**: Validar permissões
-- **Resource Filters**: Processar requisições antes do modelo
-- **Action Filters**: Validar/transformar dados
-- **Exception Filters**: Tratar exceções
-- **Result Filters**: Processar resultados
-
----
-
-**Desenvolvido como portfólio de desenvolvimento em .NET**
-
-*Última atualização: 2026*
+*Desenvolvido como projeto de portfólio em .NET — 2026*
