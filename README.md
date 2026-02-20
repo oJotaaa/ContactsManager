@@ -7,6 +7,11 @@
 A aplicação permite que usuários autenticados criem, leiam, atualizem e deletem contatos, com suporte a filtros avançados, ordenação, exportação em CSV/Excel e geração de relatórios em PDF.
 
 ---
+## 🏞️ Demonstração
+
+> ![Demonstração do ContactsManager](docs/screenshots/demo-picture.png)
+
+---
 
 ## 🎯 Funcionalidades Principais
 
